@@ -2,9 +2,8 @@ package com.github.andersonribeir0.starwars;
 
 import com.github.andersonribeir0.starwars.commands.InsertPlanetCommand;
 import com.github.andersonribeir0.starwars.exceptions.InsertPlanetException;
-import com.github.andersonribeir0.starwars.handlers.PlanetHandler;
+import com.github.andersonribeir0.starwars.handlers.ICommandHandler;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -16,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,11 +28,11 @@ public class StartWarsApplicationTests {
     private MockMvc mockMvc;
 
     @MockBean
-    public PlanetHandler planetHandlerMock;
+    public ICommandHandler planetHandlerMock;
 
     @Test
 	public void should_return_bad_request_when_trying_insert_planet_with_empty_name() throws Exception {
-        doThrow(InsertPlanetException.class).when(planetHandlerMock).handleInsert(Mockito.any());
+        doThrow(InsertPlanetException.class).when(planetHandlerMock).handle(Mockito.any());
         InsertPlanetCommand invalidCommand = new InsertPlanetCommand("", "anyClimate", "anyTerrain");
 
         mockMvc.perform(
