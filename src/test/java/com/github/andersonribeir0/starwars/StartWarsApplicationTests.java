@@ -2,7 +2,7 @@ package com.github.andersonribeir0.starwars;
 
 import com.github.andersonribeir0.starwars.commands.InsertPlanetCommand;
 import com.github.andersonribeir0.starwars.exceptions.InsertPlanetException;
-import com.github.andersonribeir0.starwars.handlers.ICommandHandler;
+import com.github.andersonribeir0.starwars.handlers.CommandHandler;
 import com.google.gson.Gson;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +28,7 @@ public class StartWarsApplicationTests {
     private MockMvc mockMvc;
 
     @MockBean
-    public ICommandHandler planetHandlerMock;
+    public CommandHandler planetHandlerMock;
 
     @Test
 	public void should_return_bad_request_when_trying_insert_planet_with_empty_name() throws Exception {
