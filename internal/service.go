@@ -94,10 +94,11 @@ func (service *PlanetService) PullPlanetByID(id string) error {
 	}
 
 	err = service.planetRepository.Save(&Planet{
-		Name:    respBody.Name,
-		Climate: respBody.Climate,
-		Terrain: respBody.Terrain,
-		Films:   films,
+		ExternalID: id,
+		Name:       respBody.Name,
+		Climate:    respBody.Climate,
+		Terrain:    respBody.Terrain,
+		Films:      films,
 	})
 
 	return errors.Wrap(err, pullPlanetByIDFunc)
