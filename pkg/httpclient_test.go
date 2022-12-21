@@ -18,7 +18,6 @@ func TestHttpClient(t *testing.T) {
 
 	for scenario, fn := range map[string]func(t *testing.T){
 		"invalid_url":         testHTTPClientInvalidURL,
-		"invalid_method":      testHTTPClientInvalidMethod,
 		"internal_server_err": testHTTPClientInternalServerError,
 		"success":             testHTTPClientDoSuccessfully,
 	} {
@@ -37,29 +36,9 @@ func testHTTPClientInvalidURL(t *testing.T) {
 	defer srv.Close()
 
 	httpClient := NewHTTPClient()
-	resultChan := httpClient.AsyncRequest(http.MethodPatch,
-		"...", nil,
-		nil)
+	resultChan := make(chan *HTTPResponse)
 
-	result := <-resultChan
-
-	assert.Error(t, result.Err())
-}
-
-func testHTTPClientInvalidMethod(t *testing.T) {
-	t.Helper()
-
-	expected := uuid.New().String()
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, expected)
-	}))
-
-	defer srv.Close()
-
-	httpClient := NewHTTPClient()
-	resultChan := httpClient.AsyncRequest("{[",
-		srv.URL, nil,
-		[]byte(`{"valid": "input"}`))
+	httpClient.AsyncGetRequest("...", nil, resultChan)
 
 	result := <-resultChan
 
@@ -69,6 +48,7 @@ func testHTTPClientInvalidMethod(t *testing.T) {
 func testHTTPClientInternalServerError(t *testing.T) {
 	t.Helper()
 
+	resultChan := make(chan *HTTPResponse)
 	expectedStatusCode := http.StatusInternalServerError
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var js json.RawMessage
@@ -85,9 +65,7 @@ func testHTTPClientInternalServerError(t *testing.T) {
 	defer srv.Close()
 
 	httpClient := NewHTTPClient()
-	resultChan := httpClient.AsyncRequest(http.MethodPost,
-		srv.URL, map[string][]string{"foo": {"bar"}},
-		[]byte("invalid_payload"))
+	httpClient.AsyncGetRequest(srv.URL, map[string][]string{"foo": {"bar"}}, resultChan)
 
 	result := <-resultChan
 
@@ -97,6 +75,7 @@ func testHTTPClientInternalServerError(t *testing.T) {
 func testHTTPClientDoSuccessfully(t *testing.T) {
 	t.Helper()
 
+	resultChan := make(chan *HTTPResponse)
 	expected := uuid.New().String()
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, expected)
@@ -105,7 +84,7 @@ func testHTTPClientDoSuccessfully(t *testing.T) {
 	defer srv.Close()
 
 	httpClient := NewHTTPClient()
-	resultChan := httpClient.AsyncRequest(http.MethodGet, srv.URL, map[string][]string{"foo": {"bar"}}, nil)
+	httpClient.AsyncGetRequest(srv.URL, map[string][]string{"foo": {"bar"}}, resultChan)
 
 	result := <-resultChan
 

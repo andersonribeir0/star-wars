@@ -1,0 +1,30 @@
+version: '3.9'
+  docker run -d --name=mongodb --hostname=mongodb --net=app -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=user -e MONGO_INITDB_ROOT_PASSWORD=pass --restart always mongo:4.2.22
+
+services:
+  db:
+    container_name: mongo_db
+    image: mongo:4.2.22
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      PGDATA: /data/postgres
+    volumes:
+      - mongodb:/data/db
+    ports:
+      - "27019:27017"
+    networks:
+      - star-wars-network
+    restart: unless-stopped
+
+  app:
+    container_name: star-wars
+    build: .
+    networks:
+      - star-wars-network
+
+networks:
+  star-wars-network:
+
+
+

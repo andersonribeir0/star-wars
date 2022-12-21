@@ -4,25 +4,29 @@ import (
 	"net/http"
 
 	"github.com/andersonribeir0/starfields/internal"
-	"go.uber.org/zap"
-
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type Adapter struct {
-	log *zap.Logger
+	log           *zap.Logger
+	planetService internal.PlanetServiceI
 }
 
 func NewAdapter(deps *internal.Dependency) *Adapter {
 	return &Adapter{
-		log: deps.Components.Log,
+		log:           deps.Components.Log,
+		planetService: deps.Services.PlanetService,
 	}
 }
 
 func (adapter *Adapter) GetPlanet(c *gin.Context) {
 	adapter.log.Info("hello")
 
-	c.JSON(http.StatusOK, gin.H{
-		"foo": "bar",
-	})
+	err := adapter.planetService.PullPlanetByID(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+	}
+
+	c.JSON(http.StatusOK, http.NoBody)
 }

@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"bytes"
 	"io"
 	"net/http"
 
@@ -35,33 +34,33 @@ func (h *HTTPResponse) Headers() map[string][]string {
 	return h.headers
 }
 
+type HTTPClientI interface {
+	AsyncGetRequest(url string, headers map[string][]string, response chan<- *HTTPResponse)
+}
+
 type HTTPClient struct{}
 
 func NewHTTPClient() *HTTPClient {
 	return &HTTPClient{}
 }
 
-func (h *HTTPClient) AsyncRequest(method, url string, headers map[string][]string, body []byte) (resp <-chan *HTTPResponse) {
+func (h *HTTPClient) AsyncGetRequest(url string, headers map[string][]string, response chan<- *HTTPResponse) {
 	var (
-		err      error
-		req      *http.Request
-		response = make(chan *HTTPResponse)
+		err error
+		req *http.Request
 	)
 
 	go func() {
-		defer close(response)
-
-		if body == nil {
-			req, err = http.NewRequest(method, url, http.NoBody)
-		} else {
-			bodyReader := bytes.NewReader(body)
-			req, err = http.NewRequest(method, url, bodyReader)
-		}
+		req, err = http.NewRequest(http.MethodGet, url, http.NoBody)
 
 		for headerKey, headerValues := range headers {
 			for _, headerValue := range headerValues {
 				req.Header.Add(headerKey, headerValue)
 			}
+		}
+
+		if headers == nil {
+			req.Header.Add("content-type", "application/son")
 		}
 
 		if err != nil {
@@ -108,6 +107,4 @@ func (h *HTTPClient) AsyncRequest(method, url string, headers map[string][]strin
 			headers:    res.Header,
 		}
 	}()
-
-	return response
 }

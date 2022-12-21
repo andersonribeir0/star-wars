@@ -18,7 +18,7 @@ func Execute() {
 
 	apiAdapter := api.NewAdapter(deps)
 
-	router.GET("/v1/planet", apiAdapter.GetPlanet)
+	router.GET("/planets/:id", apiAdapter.GetPlanet)
 
-	router.Run()
+	router.Run(":3080")
 }
