@@ -1,12 +1,13 @@
 package internal
 
 import (
+	"testing"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
-	"testing"
-	"time"
 )
 
 func TestPlanetRepository(t *testing.T) {

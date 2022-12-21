@@ -2,8 +2,9 @@ package internal
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"go.uber.org/zap"
 )

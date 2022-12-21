@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+
 	"github.com/andersonribeir0/starfields/pkg"
 )
 
