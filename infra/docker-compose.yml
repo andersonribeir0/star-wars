@@ -11,7 +11,7 @@ services:
     volumes:
       - mongodb:/data/db
     ports:
-      - "27019:27017"
+      - "27017:27017"
     networks:
       - star-wars-network
     restart: unless-stopped

@@ -1,18 +1,19 @@
 package internal
 
 import (
-	"encoding/json"
-	"fmt"
+	"context"
+	"github.com/pkg/errors"
 	"time"
 
 	"go.uber.org/zap"
 )
 
 type Planet struct {
-	Name    string  `json:"name" bson:"name"`
-	Climate string  `json:"climate" bson:"climate"`
-	Terrain string  `json:"terrain" bson:"terrain"`
-	Films   []*Film `json:"films" bson:"films"`
+	ExternalID string  `json:"external_id" bson:"external_id"`
+	Name       string  `json:"name" bson:"name"`
+	Climate    string  `json:"climate" bson:"climate"`
+	Terrain    string  `json:"terrain" bson:"terrain"`
+	Films      []*Film `json:"films" bson:"films"`
 }
 
 type Film struct {
@@ -27,15 +28,13 @@ type PlanetRepositoryI interface {
 
 type PlanetRepository struct {
 	log *zap.Logger
+	db  DBAdapterI
 }
 
-func NewPlanetRepository(log *zap.Logger) *PlanetRepository {
-	return &PlanetRepository{log: log}
+func NewPlanetRepository(log *zap.Logger, db DBAdapterI) *PlanetRepository {
+	return &PlanetRepository{log: log, db: db}
 }
 
 func (pr *PlanetRepository) Save(item *Planet) error {
-	bResp, _ := json.Marshal(item)
-	pr.log.Info(fmt.Sprintf("SAVING %s", string(bResp)))
-
-	return nil
+	return errors.Wrap(pr.db.Save(context.TODO(), item), "repository_save")
 }

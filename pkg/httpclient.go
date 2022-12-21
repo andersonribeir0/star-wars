@@ -18,6 +18,20 @@ type HTTPResponse struct {
 	headers    map[string][]string
 }
 
+func NewHTTPResponse(
+	statusCode int,
+	err error,
+	body []byte,
+	headers map[string][]string,
+) *HTTPResponse {
+	return &HTTPResponse{
+		statusCode: statusCode,
+		err:        err,
+		body:       body,
+		headers:    headers,
+	}
+}
+
 func (h *HTTPResponse) StatusCode() int {
 	return h.statusCode
 }

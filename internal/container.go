@@ -56,7 +56,12 @@ func setupComponents(ctx context.Context) (*components, error) {
 		return nil, err
 	}
 
-	planetRepository := NewPlanetRepository(log)
+	db, err := NewDBAdapter("mongodb://user:pass@localhost:27017", log)
+	if err != nil {
+		return nil, err
+	}
+
+	planetRepository := NewPlanetRepository(log, db)
 
 	return &components{
 		Log:              log,
