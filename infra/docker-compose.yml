@@ -1,5 +1,4 @@
 version: '3.9'
-  docker run -d --name=mongodb --hostname=mongodb --net=app -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=user -e MONGO_INITDB_ROOT_PASSWORD=pass --restart always mongo:4.2.22
 
 services:
   db:
