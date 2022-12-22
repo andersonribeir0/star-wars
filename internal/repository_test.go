@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"go.mongodb.org/mongo-driver/mongo"
 	"testing"
 	"time"
 
@@ -31,6 +32,14 @@ func testSavePlanetFailed(t *testing.T) {
 
 	repo := NewPlanetRepository(log, &DBAdapterMock{SaveFunc: func(data interface{}) error {
 		return errors.New("err")
+	}})
+
+	assert.Error(t, repo.Save(&Planet{}))
+
+	repo = NewPlanetRepository(log, &DBAdapterMock{SaveFunc: func(data interface{}) error {
+		return mongo.WriteException{
+			WriteErrors: []mongo.WriteError{{Code: collectionAlreadyExists}},
+		}
 	}})
 
 	assert.Error(t, repo.Save(&Planet{}))
