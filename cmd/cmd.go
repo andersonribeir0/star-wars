@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/andersonribeir0/starfields/api"
 	"github.com/andersonribeir0/starfields/internal"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
@@ -56,7 +55,7 @@ func Execute() {
 	router.Use(gin.Recovery())
 	router.Use(JSONMiddleware())
 
-	apiAdapter := api.NewAdapter(deps)
+	apiAdapter := NewAdapter(deps)
 
 	router.PUT("/planets/:id", apiAdapter.PutPlanet)
 
