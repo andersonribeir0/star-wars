@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"go.mongodb.org/mongo-driver/mongo"
+
 	"github.com/pkg/errors"
 
 	"go.uber.org/zap"
@@ -37,5 +39,21 @@ func NewPlanetRepository(log *zap.Logger, db DBAdapterI) *PlanetRepository {
 }
 
 func (pr *PlanetRepository) Save(item *Planet) error {
-	return errors.Wrap(pr.db.Save(context.TODO(), item), "repository_save")
+	err := pr.db.Save(context.TODO(), item)
+	err = processMongoErr(errors.Cause(err))
+
+	return errors.Wrap(err, "repository_save")
+}
+
+func processMongoErr(err error) error {
+	var writeErrs mongo.WriteException
+
+	writeErrs = err.(mongo.WriteException)
+	for _, v := range writeErrs.WriteErrors {
+		if v.Code == documentAlreadyExists {
+			return ErrPlanetAlreadyExists
+		}
+	}
+
+	return err
 }

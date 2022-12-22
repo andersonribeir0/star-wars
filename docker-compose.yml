@@ -9,7 +9,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: pass
       PGDATA: /data/postgres
     volumes:
-      - mongodb:/data/db
+      - ./mongodb:/data/db
     ports:
       - "27017:27017"
     networks:
@@ -19,8 +19,12 @@ services:
   app:
     container_name: star-wars
     build: .
+    ports:
+      - "3080:3080"
     networks:
       - star-wars-network
+    depends_on:
+      - db
 
 networks:
   star-wars-network:

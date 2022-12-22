@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
+
 	"github.com/andersonribeir0/starfields/pkg"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,8 +15,10 @@ import (
 )
 
 const (
-	dbTimeout        = time.Second * 15
-	newDBAdapterFunc = "new_db_adapter_func"
+	dbTimeout               = time.Second * 15
+	newDBAdapterFunc        = "new_db_adapter_func"
+	collectionAlreadyExists = 48
+	documentAlreadyExists   = 11000
 )
 
 type DBAdapterI interface {
@@ -42,9 +46,43 @@ func NewDBAdapter(connectionS string, log *zap.Logger) (*DBAdapter, error) {
 
 	log.Info("db connected")
 
+	dbName := "star-wars"
+	docName := pkg.TypeName(&Planet{})
+
+	err = client.Database(dbName).CreateCollection(context.TODO(),
+		docName)
+	if err != nil {
+		mongoErr := err.(mongo.CommandError)
+
+		if mongoErr.Code == collectionAlreadyExists {
+			return &DBAdapter{
+				client:   client,
+				database: client.Database(dbName),
+				log:      log,
+			}, nil
+		}
+
+		return nil, errors.Wrap(err, newDBAdapterFunc)
+	}
+
+	unique := true
+	mod := mongo.IndexModel{
+		Keys: bson.M{
+			"external_id": 1,
+		},
+		Options: &options.IndexOptions{
+			Unique: &unique,
+		},
+	}
+
+	_, err = client.Database(dbName).Collection(docName).Indexes().CreateOne(context.TODO(), mod)
+	if err != nil {
+		return nil, errors.Wrap(err, newDBAdapterFunc)
+	}
+
 	return &DBAdapter{
 		client:   client,
-		database: client.Database("star-wars"),
+		database: client.Database(dbName),
 		log:      log,
 	}, nil
 }

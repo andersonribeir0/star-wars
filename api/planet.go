@@ -21,11 +21,11 @@ func NewAdapter(deps *internal.Dependency) *Adapter {
 }
 
 func (adapter *Adapter) GetPlanet(c *gin.Context) {
-	adapter.log.Info("hello")
-
 	err := adapter.planetService.PullPlanetByID(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+		c.AbortWithError(http.StatusInternalServerError, err)
+
+		return
 	}
 
 	c.JSON(http.StatusOK, http.NoBody)
