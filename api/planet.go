@@ -20,7 +20,7 @@ func NewAdapter(deps *internal.Dependency) *Adapter {
 	}
 }
 
-func (adapter *Adapter) GetPlanet(c *gin.Context) {
+func (adapter *Adapter) PutPlanet(c *gin.Context) {
 	err := adapter.planetService.PullPlanetByID(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
