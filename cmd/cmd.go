@@ -27,13 +27,16 @@ func ErrorHandler(logger *zap.Logger) gin.HandlerFunc {
 
 		for _, ginErr := range c.Errors {
 			logger.Error("whoops " + ginErr.Error())
+
 			errs = append(errs, map[string]interface{}{
 				"code":    internal.ErrorCode(ginErr),
 				"message": ginErr.Error(),
 			})
 		}
 
-		c.JSON(-1, errs)
+		if errs != nil {
+			c.JSON(-1, errs)
+		}
 	}
 }
 

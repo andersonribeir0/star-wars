@@ -28,5 +28,5 @@ func (adapter *Adapter) PutPlanet(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, http.NoBody)
+	c.AbortWithStatusJSON(http.StatusOK, http.NoBody)
 }

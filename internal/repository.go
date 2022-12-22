@@ -46,6 +46,10 @@ func (pr *PlanetRepository) Save(item *Planet) error {
 }
 
 func processMongoErr(err error) error {
+	if err == nil {
+		return nil
+	}
+
 	writeErrs := err.(mongo.WriteException)
 	for _, v := range writeErrs.WriteErrors {
 		if v.Code == documentAlreadyExists {
