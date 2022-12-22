@@ -50,10 +50,9 @@ func processMongoErr(err error) error {
 		return nil
 	}
 
-	isWriteException := errors.Is(err, mongo.WriteException{})
+	writeErrs, ok := err.(mongo.WriteException)
 
-	if isWriteException {
-		writeErrs := err.(mongo.WriteException)
+	if ok {
 		for _, v := range writeErrs.WriteErrors {
 			if v.Code == documentAlreadyExists {
 				return ErrPlanetAlreadyExists
